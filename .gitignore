@@ -1,0 +1,6 @@
+#Nasty build stuff
+Build/
+
+#Nasty IDE and OS stuff
+.vscode
+Thumbs.db
