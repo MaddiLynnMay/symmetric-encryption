@@ -1,5 +1,10 @@
 #include "encrypt.h"
 
+
+/*
+    Main encryption function. The only one that can be ran outside of
+    the class.
+*/
 std::vector<int> Encrypt::encryptData(){
     std::vector<int> dataOut;
 
@@ -7,11 +12,6 @@ std::vector<int> Encrypt::encryptData(){
 
     //start by doing the initial permutation of the data
     dataOut = firstPermutation(ogData);
-
-    std::cout<<"initial perm: ";
-    doLogic.printVector(dataOut);
-
-    std::cout<<"after first print";
 
     std::vector<int> left;
     std::vector<int> right;
@@ -51,16 +51,13 @@ std::vector<int> Encrypt::encryptData(){
             dataOut = leftFinal;
             dataOut.insert(dataOut.end(), left.begin(), left.end());
         }
-
-        std::cout<< "\n\n Output Data "<< i+1 << ": ";
-        doLogic.printVector(dataOut);
     }
 
     finalPermutation(dataOut);
-    std::cout<<"\n\nThe final Data pre Hex:";
-    doLogic.printVector(dataOut);
+
     return dataOut;
 }
+
 
 /*
    Final encryption Permutation
@@ -88,7 +85,55 @@ void Encrypt::finalPermutation(std::vector<int>& data){
     data = permOut;
 }
 
+/*
+    Intital Permutation. Rearranges the ogData in order listed in IP table.
+*/
+std::vector<int> Encrypt::firstPermutation(std::vector<int> data){
+    const std::vector<int> IP = {
+        58,    50,   42,    34,    26,   18,    10,    2,
+        60,    52,   44,    36,    28,   20,    12,    4,
+        62,    54,   46,    38,    30,   22,    14,    6,
+        64,    56,   48,    40,    32,   24,    16,    8,
+        57,    49,   41,    33,    25,   17,     9,    1,
+        59,    51,   43,    35,    27,   19,    11,    3,
+        61,    53,   45,    37,    29,   21,    13,    5,
+        63,    55,   47,    39,    31,   23,    15,    7
+    };
 
+    std::vector<int> permOut;
+
+    for(int index : IP){
+        //adds the ogKey from the index in the table -1 to correct for 1 based table
+        permOut.push_back(data[index-1]);
+    }
+
+    return permOut;
+}
+
+
+/*
+    used throughout encryption to xor bits, used a common XOR method
+*/
+std::vector<int> Encrypt::xorVectors(const std::vector<int>& a, const std::vector<int>& b) {
+    if (a.size() != b.size()) {
+        throw std::invalid_argument("vectors must be same length to XOR");
+    }
+    std::vector<int> result(a.size());
+    for (size_t i = 0; i < a.size(); i++) {
+        result[i] = a[i] ^ b[i];
+    }
+    return result;
+}
+
+
+
+//  THE REST OF THIS CODE IS FOR THE TRANSFOR RIGHT METHOD
+
+/*
+    Takes the original right half, expands it and XOR's it with a key
+    then takes the bits and sends them through the s table and permutates
+    the output to get the rearranged value.
+*/
 void Encrypt::transformRight(std::vector<int>& right, int num){
     std::vector<int> expR = expandRight(right);
     std::vector<int> key = keyHandler.getKey(num);
@@ -114,8 +159,7 @@ void Encrypt::transformRight(std::vector<int>& right, int num){
         sResult.insert(sResult.end(), sValueBits.begin(), sValueBits.end());
     }
 
-    // apply the P-box permutation to sResult here, then overwrite `right`
-    right = pPermutation(sResult); // you'll need to write this, same pattern as expandRight
+    right = pPermutation(sResult); 
 }
 
 
@@ -144,7 +188,10 @@ std::vector<int> Encrypt::pPermutation(std::vector<int> keyedRight){
     return permOut;
 }
 
-
+/*
+    Used by Tranform right method
+    uses the EBit table to expand from 32 bits to 48 bits
+*/
 std::vector<int> Encrypt::expandRight(std::vector<int>& right){
     std::vector<int> EBitTable = {
         32,     1,    2,     3,     4,    5,
@@ -190,42 +237,3 @@ std::vector<int> Encrypt::toBits(int value) {
 }
 
 
-/*
-    Intital Permutation. Rearranges the ogData in order listed in IP table.
-*/
-std::vector<int> Encrypt::firstPermutation(std::vector<int> data){
-    const std::vector<int> IP = {
-        58,    50,   42,    34,    26,   18,    10,    2,
-        60,    52,   44,    36,    28,   20,    12,    4,
-        62,    54,   46,    38,    30,   22,    14,    6,
-        64,    56,   48,    40,    32,   24,    16,    8,
-        57,    49,   41,    33,    25,   17,     9,    1,
-        59,    51,   43,    35,    27,   19,    11,    3,
-        61,    53,   45,    37,    29,   21,    13,    5,
-        63,    55,   47,    39,    31,   23,    15,    7
-    };
-
-    std::vector<int> permOut;
-
-    for(int index : IP){
-        //adds the ogKey from the index in the table -1 to correct for 1 based table
-        permOut.push_back(data[index-1]);
-    }
-
-    return permOut;
-}
-
-
-/*
-    used throughout encryption to xor bits, used a common XOR method
-*/
-std::vector<int> Encrypt::xorVectors(const std::vector<int>& a, const std::vector<int>& b) {
-    if (a.size() != b.size()) {
-        throw std::invalid_argument("vectors must be same length to XOR");
-    }
-    std::vector<int> result(a.size());
-    for (size_t i = 0; i < a.size(); i++) {
-        result[i] = a[i] ^ b[i];
-    }
-    return result;
-}

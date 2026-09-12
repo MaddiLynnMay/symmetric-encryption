@@ -26,11 +26,4 @@ class Key {
         void permutation2(std::vector<int>& keys56b);
         void shiftHalf(std::vector<int>& half, int shiftNum);
 
-
-
-        
-
-
-
-
 };

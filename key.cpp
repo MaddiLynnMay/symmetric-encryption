@@ -10,13 +10,7 @@
 
 */
 void Key::generateKeys(){
-    
-    //std::cout << "check og key bits: ";
-    //doLogic.printVector(ogKey);
-
-    //std::cout << "\ncheck 56 bit key: ";
     std::vector<int> shortKey = ogPermutation();
-    //doLogic.printVector(shortKey);
 
     // Key holder, holds all the keys before perm2
     std::vector<std::vector<int>> keysPrePerm2;
@@ -56,9 +50,6 @@ void Key::generateKeys(){
         createdKey.insert(createdKey.begin(), left.begin(), left.end());
         createdKey.insert(createdKey.end(), right.begin(), right.end());
         keysPrePerm2.push_back(createdKey);
-
-        //std::cout<<"\n\n56 bit key "<< num <<": ";
-        //doLogic.printVector(keysPrePerm2[num]);
 
         permutation2(createdKey);
     }
@@ -123,10 +114,7 @@ void Key::permutation2(std::vector<int>& keys56b){
         reducedKey.push_back(keys56b[index-1]);
     }
 
-    //std::cout<<"\n48 bit key : ";
-    //doLogic.printVector(reducedKey);
     keys.push_back(reducedKey);
-    
 }
 
 
@@ -134,6 +122,6 @@ void Key::permutation2(std::vector<int>& keys56b){
     Takes in a reference to the half vectors, and shifts them
 */
 void Key::shiftHalf(std::vector<int>& half, int roundNum){
-    //int amount = shiftDist[roundNum - 1]; // -1 because roundNum is 1-indexed, vector is 0-indexed
+    // // -1 because roundNum is 1-indexed, vector is 0-indexed
     std::rotate(half.begin(), half.begin() + roundNum, half.end());
 }
