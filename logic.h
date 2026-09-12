@@ -9,6 +9,7 @@ class Logic {
     public:
         std::vector<int> convertBinary(std::string input);
         void printVector(std::vector<int> v);
+        std::string convertToHex(const std::vector<int>& bits);
 
     private:
         std::vector<int> hexToBinary(char c);

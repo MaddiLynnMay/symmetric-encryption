@@ -63,10 +63,14 @@ void Key::generateKeys(){
         permutation2(createdKey);
     }
 
-
-
-
 }
+
+std::vector<int> Key::getKey(int keyNum){
+    return keys[keyNum];
+}
+
+
+//          PRIVATE 
 
 /*
     First permuation, converting from 64 bits to a 56 bit key

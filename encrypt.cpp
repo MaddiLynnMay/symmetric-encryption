@@ -11,6 +11,8 @@ std::vector<int> Encrypt::encryptData(){
     std::cout<<"initial perm: ";
     doLogic.printVector(dataOut);
 
+    std::cout<<"after first print";
+
     std::vector<int> left;
     std::vector<int> right;
 
@@ -33,28 +35,113 @@ std::vector<int> Encrypt::encryptData(){
         leftFinal = right;
 
         //encode right half
-        transformRight(right);
+        transformRight(right, i);
 
         //use encoded right half to make left half
-
+        left = xorVectors(left, right);
 
         //create the new dataOut from combining the new halves 
         dataOut.clear();
-        dataOut = leftFinal;
 
-        dataOut.insert(dataOut.begin()+rightBegin, left.begin(), left.end());
+        if (i == 15) {
+            // final round: skip the swap, so put left first instead of leftFinal first
+            dataOut = left;
+            dataOut.insert(dataOut.end(), leftFinal.begin(), leftFinal.end());
+        } else {
+            dataOut = leftFinal;
+            dataOut.insert(dataOut.end(), left.begin(), left.end());
+        }
+
         std::cout<< "\n\n Output Data "<< i+1 << ": ";
         doLogic.printVector(dataOut);
     }
 
+    finalPermutation(dataOut);
+    std::cout<<"\n\nThe final Data pre Hex:";
+    doLogic.printVector(dataOut);
     return dataOut;
 }
 
-void Encrypt::transformRight(std::vector<int>& right){
-    std::vector<int> expR = expandRight(right);
-    std::cout<<"\n Expanded Right Side: ";
-    doLogic.printVector(expR);
+/*
+   Final encryption Permutation
+*/
+void Encrypt::finalPermutation(std::vector<int>& data){
+    const std::vector<int> P = {
+        40,     8,   48,    16,    56,   24,    64,   32,
+        39,     7,   47,    15,    55,   23,    63,   31,
+        38,     6,   46,    14,    54,   22,    62,   30,
+        37,     5,   45,    13,    53,   21,    61,   29,
+        36,     4,   44,    12,    52,   20,    60,   28,
+        35,     3,   43,    11,    51,   19,    59,   27,
+        34,     2,   42,    10,    50,   18,    58,   26,
+        33,     1,   41,     9,    49,   17,    57,   25
+    };
 
+    std::vector<int> permOut;
+
+    for(int index : P){
+        //adds the ogKey from the index in the table -1 to correct for 1 based table
+        permOut.push_back(data[index-1]);
+    }
+
+    data.clear();
+    data = permOut;
+}
+
+
+void Encrypt::transformRight(std::vector<int>& right, int num){
+    std::vector<int> expR = expandRight(right);
+    std::vector<int> key = keyHandler.getKey(num);
+
+    std::vector<int> rightXORkey = xorVectors(expR, key);
+
+    std::vector<std::vector<int>> sTables = {s1, s2, s3, s4, s5, s6, s7, s8};
+
+    std::vector<int> bitBlock;
+    std::vector<int> sValueBits;
+    std::vector<int> sResult;
+
+    for (int i = 0; i < 8; i++){
+        int blockIndx = i * 6;
+
+        bitBlock.clear();
+        bitBlock.insert(bitBlock.begin(), rightXORkey.begin()+blockIndx, rightXORkey.begin()+blockIndx+6);
+
+        int searchIndex = getSBoxIndex(bitBlock);
+        int sValue = sTables.at(i).at(searchIndex);
+        sValueBits = toBits(sValue);
+
+        sResult.insert(sResult.end(), sValueBits.begin(), sValueBits.end());
+    }
+
+    // apply the P-box permutation to sResult here, then overwrite `right`
+    right = pPermutation(sResult); // you'll need to write this, same pattern as expandRight
+}
+
+
+/*
+    Last Permutation for Transform Right Function
+*/
+std::vector<int> Encrypt::pPermutation(std::vector<int> keyedRight){
+    const std::vector<int> P = {
+        16,   7,  20,  21,
+        29,  12,  28,  17,
+         1,  15,  23,  26,
+         5,  18,  31,  10,
+         2,   8,  24,  14,
+        32,  27,   3,   9,
+        19,  13,  30,   6,
+        22,  11,   4,  25
+    };
+
+    std::vector<int> permOut;
+
+    for(int index : P){
+        //adds the ogKey from the index in the table -1 to correct for 1 based table
+        permOut.push_back(keyedRight[index-1]);
+    }
+
+    return permOut;
 }
 
 
@@ -77,6 +164,29 @@ std::vector<int> Encrypt::expandRight(std::vector<int>& right){
         permOut.push_back(right[index-1]);
     }
     return permOut;
+}
+
+
+/*
+    Converts the bit block into an index that can be used to pull the right 
+    value from the table
+*/
+int Encrypt::getSBoxIndex(const std::vector<int>& sixBits) {
+    int row = (sixBits[0] << 1) | sixBits[5];
+    int col = (sixBits[1] << 3) | (sixBits[2] << 2) | (sixBits[3] << 1) | sixBits[4];
+    return (row * 16) + col;
+}
+
+
+/*
+    converts s table result to bits
+*/
+std::vector<int> Encrypt::toBits(int value) {
+    std::vector<int> bits;
+    for (int shift = 3; shift >= 0; shift--) {
+        bits.push_back((value >> shift) & 1);
+    }
+    return bits;
 }
 
 
@@ -104,8 +214,6 @@ std::vector<int> Encrypt::firstPermutation(std::vector<int> data){
 
     return permOut;
 }
-
-
 
 
 /*

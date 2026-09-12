@@ -35,22 +35,43 @@ std::vector<int> Logic::convertBinary(std::string input){
 }
 
 /*
+    Covenverts from Binary to Hexidecimal
+*/
+std::string Logic::convertToHex(const std::vector<int>& bits){
+    if (bits.size() % 4 != 0) {
+        throw std::invalid_argument("bit vector length must be a multiple of 4");
+    }
+
+    const std::string hexDigits = "0123456789ABCDEF";
+    std::string result;
+
+    for (size_t i = 0; i < bits.size(); i += 4) {
+        int value = (bits[i] << 3) | (bits[i+1] << 2) | (bits[i+2] << 1) | bits[i+3];
+        result += hexDigits[value];
+    }
+
+    return result;
+}
+
+/*
     Simply prints vector for debugging and visuals
 */
 void Logic::printVector(std::vector<int> v){
     int spacer = 0;
     int bitSize = v.size();
 
-    std::cout<<std::endl;
+    std::cout << std::endl;
     for (const auto& element : v) {
-        //includes spaces to make more readable
-        if(bitSize == 64 && spacer%4 == 0){
-            std::cout<<" ";
+        // includes spaces to make more readable
+        if(bitSize == 48 && spacer%6 == 0){
+            std::cout << " ";
         }
-        else if(bitSize == 48 && spacer%6 == 0){
-            std::cout<<" ";
+        if(spacer%4 == 0){
+            std::cout << " ";
         }
         std::cout << element;
         spacer++;
     }
 }
+
+

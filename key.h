@@ -14,10 +14,11 @@ class Key {
         //std::string getKey();
         void generateKeys();
 
+        std::vector<int> getKey(int keyNum);
+
     private:
         std::vector<int> ogKey;
         std::vector<std::vector<int>> keys;
-        int keyNum = 0;
 
         Logic doLogic;
 

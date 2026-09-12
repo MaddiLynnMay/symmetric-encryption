@@ -11,8 +11,11 @@ int main (){
     std::string key = "133457799BBCDFF1";
 
     Encrypt doEncrypt(data, key);
-    doEncrypt.encryptData();
-    
+    Logic doLogic;
+    std::vector<int> encryptedData = doEncrypt.encryptData();
+
+    std::string finalOut = doLogic.convertToHex(encryptedData);
+    std::cout<<"\nFinal Encrypted Hex Message: "+ finalOut;
 
     return 0;
 }
