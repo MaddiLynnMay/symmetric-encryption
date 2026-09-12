@@ -1,5 +1,10 @@
 #include "logic.h"
 
+
+/*
+    This is a helper class that processes data 
+*/
+
 /*
     Converts hex string data into a bit vector to use in the encryption process
 */
@@ -34,11 +39,15 @@ std::vector<int> Logic::convertBinary(std::string input){
 */
 void Logic::printVector(std::vector<int> v){
     int spacer = 0;
+    int bitSize = v.size();
 
     std::cout<<std::endl;
     for (const auto& element : v) {
         //includes spaces to make more readable
-        if(spacer%4 == 0){
+        if(bitSize == 64 && spacer%4 == 0){
+            std::cout<<" ";
+        }
+        else if(bitSize == 48 && spacer%6 == 0){
             std::cout<<" ";
         }
         std::cout << element;

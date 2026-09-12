@@ -26,18 +26,6 @@ class Key {
         void shiftHalf(std::vector<int>& half, int shiftNum);
 
 
-        /*
-            Tables used by the key methods to make the keys
-        */
-
-        // //used to shift the halves in shiftHalf() method
-        // const std::vector<int> shiftDist = {
-        //         1,  1,  2,  2,  
-        //         2,  2,  2,  2,  
-        //         1,  2,  2,  2,  
-        //         2,  2,  2,  1
-        // };
-
 
         
 

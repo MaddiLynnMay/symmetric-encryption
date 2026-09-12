@@ -11,12 +11,12 @@
 */
 void Key::generateKeys(){
     
-    std::cout << "check og key bits: ";
-    doLogic.printVector(ogKey);
+    //std::cout << "check og key bits: ";
+    //doLogic.printVector(ogKey);
 
-    std::cout << "\ncheck 56 bit key: ";
+    //std::cout << "\ncheck 56 bit key: ";
     std::vector<int> shortKey = ogPermutation();
-    doLogic.printVector(shortKey);
+    //doLogic.printVector(shortKey);
 
     // Key holder, holds all the keys before perm2
     std::vector<std::vector<int>> keysPrePerm2;
@@ -38,7 +38,7 @@ void Key::generateKeys(){
             2,  2,  2,  1
         };
 
-    //creates all of the keys befor perm2
+    //creates all of the keys before perm2
     for (int num = 1; num <= 16; num++){
         createdKey.clear();
 
@@ -57,8 +57,8 @@ void Key::generateKeys(){
         createdKey.insert(createdKey.end(), right.begin(), right.end());
         keysPrePerm2.push_back(createdKey);
 
-        std::cout<<"\n\n56 bit key "<< num <<": ";
-        doLogic.printVector(keysPrePerm2[num]);
+        //std::cout<<"\n\n56 bit key "<< num <<": ";
+        //doLogic.printVector(keysPrePerm2[num]);
 
         permutation2(createdKey);
     }
@@ -119,8 +119,8 @@ void Key::permutation2(std::vector<int>& keys56b){
         reducedKey.push_back(keys56b[index-1]);
     }
 
-    std::cout<<"\n48 bit key : ";
-    doLogic.printVector(reducedKey);
+    //std::cout<<"\n48 bit key : ";
+    //doLogic.printVector(reducedKey);
     keys.push_back(reducedKey);
     
 }
